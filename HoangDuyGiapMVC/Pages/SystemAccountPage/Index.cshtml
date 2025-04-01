@@ -1,0 +1,82 @@
+﻿@page
+@model HoangDuyGiapMVC.Pages.SystemAccountPage.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+@{
+    ViewData["Title"] = "Create";
+    string? email = HttpContext.Session.GetString("Email");
+    int? role = HttpContext.Session.GetInt32("RoleId");
+
+    if (email == null || (role != 3))
+    {
+        TempData["ErrorMessage"] = "You do not have permission to do this function";
+        Response.Redirect("/Error");
+    }
+}
+
+<form method="post" asp-page="/Logout" style="margin: 0;">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="dropdown-item" style="width: 100%; text-align: left; padding: 8px 12px; border: none; background: none; cursor: pointer;">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.SystemAccount[0].AccountName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SystemAccount[0].AccountEmail)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SystemAccount[0].AccountRole)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SystemAccount[0].AccountPassword)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.SystemAccount) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.AccountName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AccountEmail)
+            </td>
+            <td>
+                    @(item.AccountRole == 1 ? "Staff" : item.AccountRole == 2 ? "Lecturer" : "")
+            </td>
+            <td>
+                ********
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.AccountId">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.AccountId">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.AccountId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<ul class="pagination">
+    @for (var i = 1; i <= Model.TotalPages; i++)
+    {
+        <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+            <a class="page-link" asp-route-pageIndex="@i">@i</a>
+        </li>
+    }
+</ul>

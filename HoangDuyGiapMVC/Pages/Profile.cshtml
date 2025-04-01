@@ -1,0 +1,86 @@
+﻿@page
+@model HoangDuyGiapMVC.Pages.ProfileModel
+@{
+}
+<a asp-page="/UserEditProfile" asp-route-id="@HttpContext.Session.GetInt32("id")">Edit Your profile</a>
+<a asp-page="/NewsArticlePage/Index" asp-route-id="@HttpContext.Session.GetInt32("id")">Back to homepage</a>
+
+<div class="container mt-4">
+    <h2 class="mb-4">Profile</h2>
+
+    <!-- Region 1: Account Information -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4>Account Information</h4>
+        </div>
+        <div class="card-body">                     
+            <dl class="row">
+                <dt class="col-sm-3">Account ID:</dt>
+                <dd class="col-sm-9">@Model.Account.AccountId</dd>
+
+                <dt class="col-sm-3">Name:</dt>
+                <dd class="col-sm-9">@Model.Account.AccountName</dd>
+
+                <dt class="col-sm-3">Email:</dt>
+                <dd class="col-sm-9">@Model.Account.AccountEmail</dd>
+
+                <dt class="col-sm-3">Role:</dt>
+                <dd class="col-sm-9">@(Model.Account.AccountRole == 2 ? "Lecturer" : Model.Account.AccountRole == 1 ? "Staff" : "Unknown")</dd>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Region 2: News Articles Table -->
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <h4>News Articles</h4>
+        </div>
+        <div class="card-body">
+            @if (Model.NewsArticles != null && Model.NewsArticles.Any())
+            {
+                <table class="table table-striped table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>News Title</th>
+                            <th>Headline</th>
+                            <th>Created Date</th>
+                            <th>News Content</th>
+                            <th>News Source</th>
+                            <th>Category Name</th>
+                            <th>News Status</th>
+                            <th>Tags</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var article in Model.NewsArticles)
+                        {
+                            <tr>
+                                <td>@article.NewsTitle</td>
+                                <td>@article.Headline</td>
+                                <td>@article.CreatedDate?.ToString("g")</td>
+                                <td>@article.NewsContent</td>
+                                <td>@article.NewsSource</td>
+                                <td>@article.CategoryName</td>
+                                <td>@(article.NewsStatus == true ? "Active" : "Inactive")</td>
+                                <td>
+                                    @if (article.Tags != null && article.Tags.Any())
+                                    {
+                                        @string.Join(", ", article.Tags)
+                                    }
+                                    else
+                                    {
+                                        <em>No Tags</em>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No news articles available.</p>
+            }
+        </div>
+    </div>
+</div>

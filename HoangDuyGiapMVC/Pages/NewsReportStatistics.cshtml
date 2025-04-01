@@ -1,0 +1,126 @@
+﻿@page
+@model HoangDuyGiapMVC.Pages.NewsReportStatisticsModel
+@{
+    ViewData["Title"] = "News Report Statistics";
+}
+
+@{
+    ViewData["Title"] = "Create";
+
+    string? email = HttpContext.Session.GetString("Email");
+    int? role = HttpContext.Session.GetInt32("RoleId");
+
+    if (email == null || (role != 3))
+    {
+        TempData["ErrorMessage"] = "You do not have permission to do this function";
+        Response.Redirect("/Error");
+    }
+}
+
+<form method="post" asp-page="/Logout" style="margin: 0;">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="dropdown-item" style="width: 100%; text-align: left; padding: 8px 12px; border: none; background: none; cursor: pointer;">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+</form>
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mt-4">News Report Statistics</h1>
+        <a asp-page="/SystemAccountPage/Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Account Management
+        </a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-filter me-1"></i>
+            Filter Report Parameters
+        </div>
+        <div class="card-body">
+            <form method="post" class="row g-3">
+                <div class="col-md-5">
+                    <label asp-for="StartDate" class="form-label">Start Date</label>
+                    <input asp-for="StartDate" type="date" class="form-control" />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+                <div class="col-md-5">
+                    <label asp-for="EndDate" class="form-label">End Date</label>
+                    <input asp-for="EndDate" type="date" class="form-control" />
+                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                </div>
+                <div class="col-md-2 align-self-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-chart-bar me-1"></i>Generate Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.ReportStatistics != null && Model.ReportStatistics.Any())
+    {
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                Report Statistics Details
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="reportStatisticsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Category</th>
+                                <th>Total Articles</th>
+                                <th>Earliest Article Date</th>
+                                <th>Latest Article Date</th>
+                                <th>Top Tags</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var stat in Model.ReportStatistics)
+                            {
+                                <tr>
+                                    <td>@stat.CategoryName</td>
+                                    <td class="text-end">@stat.TotalArticles</td>
+                                    <td>@(stat.EarliestArticleDate?.ToString("yyyy-MM-dd"))</td>
+                                    <td>@(stat.LatestArticleDate?.ToString("yyyy-MM-dd"))</td>
+                                    <td>@string.Join(", ", stat.TopTags ?? new List<string>())</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="5" class="text-muted small">
+                                    Total Categories: @Model.ReportStatistics.Count
+                                    | Total Articles: @Model.ReportStatistics.Sum(r => r.TotalArticles)
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info" role="alert">
+            <i class="fas fa-info-circle me-2"></i>
+            No statistics found for the selected date range. Please adjust your search criteria.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $('#reportStatisticsTable').DataTable({
+                "pageLength": 10,
+                "order": [[1, 'desc']], // Sort by total articles in descending order
+                "responsive": true
+            });
+        });
+    </script>
+}
+

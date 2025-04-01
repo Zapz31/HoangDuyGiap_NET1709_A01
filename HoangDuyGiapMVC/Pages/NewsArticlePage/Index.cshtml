@@ -1,0 +1,215 @@
+﻿@page
+@model HoangDuyGiapMVC.Pages.NewsArticlePage.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+@section Scripts
+{
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/sinalRHub")
+            .build();
+
+connection.on("Change", function()
+{
+    location.reload();
+});
+
+connection.start().catch(function(err) {
+    console.error(err.toString());
+});
+    </script >
+}
+
+<!-- User Menu Rectangle (positioned fixed on the left side) -->
+<div class="user-menu" style="position: fixed; left: 0; top: 20px; background-color: #f8f9fa; padding: 10px 15px; border: 1px solid #ccc; cursor: pointer; z-index: 1000;">
+    @HttpContext.Session.GetString("AccountName")
+    <!-- Dropdown: hidden by default -->
+    <div class="dropdown-menu" style="display: none; position: absolute; top: 100%; left: 0; background-color: #fff; border: 1px solid #ccc; width: 200px;">
+        <!-- Profile Option -->
+        <a class="dropdown-item" asp-page="/SystemAccountPage/Details" asp-route-id="@HttpContext.Session.GetInt32("id")" style="display: block; padding: 8px 12px; text-decoration: none; color: #333;">
+            <i class="fas fa-user"></i> Profile
+        </a>
+        <!-- Logout Option: posts to a Logout page which will clear the session -->
+        <form method="post" asp-page="/Logout" style="margin: 0;">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="dropdown-item" style="width: 100%; text-align: left; padding: 8px 12px; border: none; background: none; cursor: pointer;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </form>
+    </div>
+</div>
+
+<a asp-page="/Profile" asp-route-id="@HttpContext.Session.GetInt32("id")">Your profile</a>
+
+<form method="post" asp-page="/Logout" style="margin: 0;">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="dropdown-item" style="width: 100%; text-align: left; padding: 8px 12px; border: none; background: none; cursor: pointer;">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+</form>
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+
+@if (TempData["Message"] != null)
+{
+    <h2 class="text-info">@TempData["Message"]</h2>
+}
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mt-4">News Article management</h1>
+        @if (HttpContext.Session.GetInt32("RoleId") == 1)
+        {
+            <a asp-page="/CategoryPage/Index" class="btn btn-secondary">
+                <i class="fas fa-tags"></i> Category Management
+            </a>
+        }
+    </div>
+    <form method="get">
+        <input type="text" name="searchTerm" />
+        <input type="submit" value="Search" />
+    </form>
+    <ul class="pagination">
+        @for (var i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                <a class="page-link" asp-route-pageIndex="@i">@i</a>
+            </li>
+        }
+    </ul>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.NewsArticle[0].NewsTitle)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.NewsArticle[0].Headline)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.NewsArticle[0].CreatedDate)
+                </th>
+                @* <th>
+                @Html.DisplayNameFor(model => model.NewsArticle[0].NewsContent)
+                </th> *@
+                <th>
+                    @Html.DisplayNameFor(model => model.NewsArticle[0].NewsSource)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.NewsArticle[0].NewsStatus)
+                </th>
+                @* <th>
+                @Html.DisplayNameFor(model => model.NewsArticle[0].UpdatedById)
+                </th> *@
+                <th>
+                    @Html.DisplayNameFor(model => model.NewsArticle[0].ModifiedDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.NewsArticle[0].Category)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.NewsArticle[0].CreatedBy)
+                </th>
+                <!-- Thêm tiêu đề cột Tags -->
+                <th>
+                    Tags
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.NewsArticle)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.NewsTitle)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Headline)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedDate)
+                    </td>
+                    @* <td>
+                @Html.DisplayFor(modelItem => item.NewsContent)
+                </td> *@
+                    <td>
+                        @Html.DisplayFor(modelItem => item.NewsSource)
+                    </td>
+                    <td>
+                        @(item.NewsStatus == true ? "Active" : "Inactive")
+                    </td>
+                    @* <td>
+                @Html.DisplayFor(modelItem => item.UpdatedById)
+                </td> *@
+                    <td>
+                        @(item.ModifiedDate != null ? item.ModifiedDate.ToString() : "N/A")
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Category.CategoryName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedBy.AccountName)
+                    </td>
+                    <!-- Thêm cột hiển thị Tags -->
+                    <td>
+                        @if (item.Tags != null && item.Tags.Any())
+                        {
+                            <div class="d-flex flex-wrap" style="max-width: 200px;">
+                                @foreach (var tag in item.Tags.Take(3))
+                                {
+                                    <span class="badge bg-info text-dark me-1 mb-1" style="font-size: 0.8rem;">@tag.TagName</span>
+                                }
+                                @if (item.Tags.Count() > 3)
+                                {
+                                    <span class="badge bg-secondary text-white me-1 mb-1" style="font-size: 0.8rem;">+@(item.Tags.Count() - 3)</span>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No tags</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@item.NewsArticleId">Edit</a> |
+                        <a asp-page="./Details" asp-route-id="@item.NewsArticleId">Details</a> |
+                        <a asp-page="./Delete" asp-route-id="@item.NewsArticleId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Script to toggle the dropdown display -->
+<script>
+    // Attach click event to the entire user-menu rectangle
+    document.querySelector('.user-menu').addEventListener('click', function (e) {
+        // Prevent any default behavior
+        e.preventDefault();
+        var dropdown = this.querySelector('.dropdown-menu');
+        if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+            dropdown.style.display = 'block';
+        } else {
+            dropdown.style.display = 'none';
+        }
+    });
+
+    // Optional: hide the dropdown if clicking outside the user menu
+    document.addEventListener('click', function (e) {
+        var userMenu = document.querySelector('.user-menu');
+        if (!userMenu.contains(e.target)) {
+            var dropdown = userMenu.querySelector('.dropdown-menu');
+            dropdown.style.display = 'none';
+        }
+    });
+</script>

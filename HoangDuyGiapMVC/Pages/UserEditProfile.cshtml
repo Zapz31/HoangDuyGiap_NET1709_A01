@@ -1,0 +1,64 @@
+﻿@page
+@model HoangDuyGiapMVC.Pages.UserEditProfileModel
+@{
+    ViewData["Title"] = "Edit";
+}
+
+@if (TempData["Message"] != null)
+{
+    <h2 class="text-info">@TempData["Message"]</h2>
+}
+
+<a asp-page="/Profile" asp-route-id="@HttpContext.Session.GetInt32("id")">Your profile</a>
+
+<h1>Edit your profile</h1>
+@if (TempData["Message"] != null)
+{
+    <div class="text-danger">@TempData["Message"]</div>
+}
+<h4>SystemAccount</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="SystemAccount.AccountId" />
+            <div class="form-group">
+                <label asp-for="SystemAccount.AccountName" class="control-label"></label>
+                <input asp-for="SystemAccount.AccountName" class="form-control" />
+                <span asp-validation-for="SystemAccount.AccountName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SystemAccount.AccountEmail" class="control-label"></label>
+                <input asp-for="SystemAccount.AccountEmail" class="form-control" />
+                <span asp-validation-for="SystemAccount.AccountEmail" class="text-danger"></span>
+            </div>
+            @* <div class="form-group">
+                <label asp-for="SystemAccount.AccountRole" class="control-label"></label>
+                <select asp-for="SystemAccount.AccountRole" class="form-control" asp-items="Model.RoleList"></select>
+                <span asp-validation-for="SystemAccount.AccountRole" class="text-danger"></span>
+            </div> *@
+            <div>
+                <input type="hidden" asp-for="SystemAccount.AccountRole" />
+            </div>
+            <div class="form-group">
+                <label asp-for="SystemAccount.AccountPassword" class="control-label"></label>
+                <input asp-for="SystemAccount.AccountPassword" class="form-control" />
+                <span asp-validation-for="SystemAccount.AccountPassword" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="/Profile" asp-route-id="@HttpContext.Session.GetInt32("id")">Your profile</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
