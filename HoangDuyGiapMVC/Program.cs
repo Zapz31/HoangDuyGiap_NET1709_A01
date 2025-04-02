@@ -22,7 +22,7 @@ if (!app.Environment.IsDevelopment())
 	app.UseExceptionHandler("/Error");
 }
 
-app.MapHub<SignalRHub>("/sinalRHub");
+app.MapHub<SignalRHub>("/signalRHub");
 
 app.UseStaticFiles();
 

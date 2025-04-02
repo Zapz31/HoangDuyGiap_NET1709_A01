@@ -32,10 +32,8 @@ namespace HoangDuyGiapMVC.Pages.NewsArticlePage
         public async Task<IActionResult> OnGet()
         {
             var categoryList = await _categoryRepo.GetList();
-            var systemAccount = await _systemAccountRepo.GetList();
             var tagList = await _tagRepo.GetList();
             ViewData["CategoryId"] = new SelectList(categoryList, "CategoryId", "CategoryName");
-            ViewData["CreatedById"] = new SelectList(systemAccount, "AccountId", "AccountName");
             ViewData["TagList"] = new SelectList(tagList, "TagId", "TagName");
             return Page();
         }

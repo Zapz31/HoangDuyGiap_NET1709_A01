@@ -6,10 +6,10 @@
 }
 @section Scripts
 {
-    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script src="~/microsoft/signalr/dist/browser/signalr.min.js"></script>
     <script>
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("/sinalRHub")
+            .withUrl("/signalRHub")
             .build();
 
 connection.on("Change", function()

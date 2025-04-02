@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using FUNewsManagement_BOs;
 using FUNewsManagement_DAOs;
 using FUNewsManagement_Repos;
+using HoangDuyGiapMVC.Pages.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace HoangDuyGiapMVC.Pages.NewsArticlePage
 {
@@ -17,12 +19,14 @@ namespace HoangDuyGiapMVC.Pages.NewsArticlePage
         private readonly INewsArticleRepo _newsArticleRepo;
         private readonly ICategoryRepo _categoryRepo;
         private readonly ISystemAccountRepo _systemAccountRepo;
+        private readonly IHubContext<SignalRHub> _hubContext;
 
-        public EditModel(INewsArticleRepo newsArticleRepo, ICategoryRepo categoryRepo, ISystemAccountRepo systemAccountRepo)
+        public EditModel(INewsArticleRepo newsArticleRepo, ICategoryRepo categoryRepo, ISystemAccountRepo systemAccountRepo, IHubContext<SignalRHub> hubContext)
         {
             _categoryRepo = categoryRepo;
             _newsArticleRepo = newsArticleRepo;
             _systemAccountRepo = systemAccountRepo;
+            _hubContext = hubContext;
         }
 
         [BindProperty]
@@ -103,6 +107,7 @@ namespace HoangDuyGiapMVC.Pages.NewsArticlePage
                 }
                 NewsArticle.UpdatedById = (short?)sessionId;
                 await _newsArticleRepo.UpdateNewsAricle(NewsArticle);
+                await _hubContext.Clients.All.SendAsync("Change");
                 TempData["Message"] = "Update Succesfull";
 
                 return RedirectToPage("./Index");

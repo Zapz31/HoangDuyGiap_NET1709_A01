@@ -100,7 +100,7 @@ namespace FUNewsManagement_DAOs
                 {
                     throw new Exception("Category does not exist");
                 }
-                var createdBy = await _context.SystemAccounts.FirstOrDefaultAsync(x => x.AccountId.Equals(newsArticle.CreatedById));
+                var createdBy = await _context.SystemAccounts.AsNoTracking().FirstOrDefaultAsync(x => x.AccountId.Equals(newsArticle.CreatedById));
                 if (createdBy == null)
                 {
                     throw new Exception("Category does not exist");

@@ -8,16 +8,20 @@ using Microsoft.EntityFrameworkCore;
 using FUNewsManagement_BOs;
 using FUNewsManagement_DAOs;
 using FUNewsManagement_Repos;
+using HoangDuyGiapMVC.Pages.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace HoangDuyGiapMVC.Pages.NewsArticlePage
 {
     public class DeleteModel : PageModel
     {
         private readonly INewsArticleRepo _newsArticleRepo;
+        private readonly IHubContext<SignalRHub> _hubContext;
 
-        public DeleteModel(INewsArticleRepo newsArticleRepo)
+        public DeleteModel(INewsArticleRepo newsArticleRepo, IHubContext<SignalRHub> hubContext)
         {
             _newsArticleRepo = newsArticleRepo;
+            _hubContext = hubContext;
         }
 
         [BindProperty]
@@ -51,6 +55,7 @@ namespace HoangDuyGiapMVC.Pages.NewsArticlePage
             }
 
             await _newsArticleRepo.DeleteNewsArticle(id);
+            await _hubContext.Clients.All.SendAsync("Change");
             TempData["Message"] = "Delete Succesfull";
 
             return RedirectToPage("./Index");
